@@ -1,4 +1,3 @@
-import re
 import os
 
 from PyQt6 import QtWidgets, QtGui
@@ -11,7 +10,6 @@ class Window(QtWidgets.QMainWindow):
 
     __notes_list: list[NoteWidget]
     __folder: str
-    __untitled_counter: int
 
     def __init__(self) -> None:
         super().__init__()
@@ -19,7 +17,6 @@ class Window(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.__untitled_counter = 0
         self.__notes_list = []
         self.__folder = ""
 
@@ -34,16 +31,17 @@ class Window(QtWidgets.QMainWindow):
             lambda: self.ui.deletePushButton.setEnabled(False))
 
     def NewNote(self, action_stub, need_open: bool = True, title: str = "", text: str = "") -> None:
+        # если не установлена папка, спрашиваем её
         if (self.__folder == ""):
             self.SelectFolder()
 
-        self.__untitled_counter = self.MaxUntitledNoteNumber() + 1
-
+        # если название не было передано, то это новая метка
         if (title == ""):
             title = "UntitledNote"
+            print(self.MaxUntitledNoteNumber())
 
-            if (self.__untitled_counter):
-                title = f"UntitledNote_{self.__untitled_counter}"
+            if (self.MaxUntitledNoteNumber() >= 0):
+                title = f"UntitledNote_{self.MaxUntitledNoteNumber() + 1}"
 
         new_note = NoteWidget(title, text, len(self.__notes_list))
 
@@ -159,17 +157,26 @@ class Window(QtWidgets.QMainWindow):
             pass  # yeah, nothing, lol
 
     def MaxUntitledNoteNumber(self):
-        untitled_note_pattern = re.compile(r'UntitledNote_(\d+)\.txt')
-        max_number = 0
+        note_files = [f for f in os.listdir(self.__folder) if f.startswith(
+            "UntitledNote") and f.endswith(".txt")]
 
-        for filename in os.listdir(self.__folder):
-            match = untitled_note_pattern.match(filename)
-            if match:
-                number = int(match.group(1))
-                if number > max_number:
-                    max_number = number
+        if not note_files:
+            return -1
 
-        return max_number
+        if len(note_files) == 1 and note_files[0] == "UntitledNote.txt":
+            return 0
+
+        # извлекаем номера из файлов и находим максимальный
+        numbers = []
+        for f in note_files:
+            if "_" in f:
+                try:
+                    num = int(f.split("_")[1].split(".")[0])
+                    numbers.append(num)
+                except (IndexError, ValueError):
+                    pass
+
+        return max(numbers)
 
 
 if __name__ == "__main__":
