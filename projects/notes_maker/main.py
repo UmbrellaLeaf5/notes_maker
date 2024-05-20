@@ -2,7 +2,7 @@ from PyQt6 import QtWidgets, QtGui
 
 from mainwindow import Ui_MainWindow
 
-from note import NoteWidget
+from notewidget import NoteWidget
 
 
 class Window(QtWidgets.QMainWindow):
