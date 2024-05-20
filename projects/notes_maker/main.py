@@ -1,4 +1,4 @@
-from PyQt6 import QtWidgets
+from PyQt6 import QtWidgets, QtGui
 
 from mainwindow import Ui_MainWindow
 
@@ -24,9 +24,14 @@ class Window(QtWidgets.QMainWindow):
 
         self.ui.newPushButton.clicked.connect(self.NewNote)
         self.ui.folderPushButton.clicked.connect(self.SelectFolder)
+        self.ui.deletePushButton.clicked.connect(self.DeleteNote)
+
         self.ui.notesListWidget.itemDoubleClicked.connect(self.OpenNote)
 
-        self.ui.notesListWidget.itemSelectionChanged.connect(self.DeleteNoteBySelection)
+        self.ui.notesListWidget.itemClicked.connect(self.DeleteNoteBySelection)
+
+        self.ui.notesListWidget.itemSelectionChanged.connect(
+            lambda: self.ui.deletePushButton.setEnabled(False))
 
     def NewNote(self, action_stub, need_open: bool = True, title: str = "") -> None:
         self.__current_index = -1
@@ -94,7 +99,7 @@ class Window(QtWidgets.QMainWindow):
 
     def DeleteNoteBySelection(self, item: QtWidgets.QListWidgetItem):
         self.__current_index = self.ui.notesListWidget.row(item)
-        self.DeleteNote()
+        self.ui.deletePushButton.setEnabled(True)
 
     def UpdateNotesList(self):
         self.ui.notesListWidget.clear()
@@ -112,6 +117,10 @@ class Window(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
+
+    icon = QtGui.QIcon('icon.png')
+    app.setWindowIcon(icon)
+
     window = Window()
     window.show()
 
