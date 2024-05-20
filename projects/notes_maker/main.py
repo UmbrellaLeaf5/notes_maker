@@ -2,8 +2,8 @@ import os
 
 from PyQt6 import QtWidgets, QtGui
 
-from mainwindow import Ui_MainWindow
-from notewidget import NoteWidget
+from main_window import Ui_MainWindow
+from note_widget import NoteWidget
 
 
 class Window(QtWidgets.QMainWindow):

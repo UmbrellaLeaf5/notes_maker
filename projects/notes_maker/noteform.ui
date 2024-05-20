@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QWidget" name="horizontalWidget_2" native="true">
+    <widget class="QWidget" name="horizontalWidget" native="true">
      <layout class="QHBoxLayout" name="titleLayout">
       <item>
        <widget class="QLabel" name="titleLabel">
