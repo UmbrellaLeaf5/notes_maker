@@ -44,6 +44,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="deletePushButton">
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Orientation::Horizontal</enum>

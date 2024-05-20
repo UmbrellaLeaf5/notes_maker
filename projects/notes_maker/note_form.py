@@ -34,9 +34,15 @@ class Ui_NoteForm(object):
         self.footerWidget.setObjectName("footerWidget")
         self.buttonsHorizontalLayout = QtWidgets.QHBoxLayout(self.footerWidget)
         self.buttonsHorizontalLayout.setObjectName("buttonsHorizontalLayout")
+
         self.savePushButton = QtWidgets.QPushButton(parent=self.footerWidget)
         self.savePushButton.setObjectName("savePushButton")
         self.buttonsHorizontalLayout.addWidget(self.savePushButton)
+
+        self.deletePushButton = QtWidgets.QPushButton(parent=self.footerWidget)
+        self.deletePushButton.setObjectName("deletePushButton")
+        self.buttonsHorizontalLayout.addWidget(self.deletePushButton)
+
         spacerItem = QtWidgets.QSpacerItem(
             40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.buttonsHorizontalLayout.addItem(spacerItem)
@@ -50,6 +56,7 @@ class Ui_NoteForm(object):
         noteForm.setWindowTitle(_translate("noteForm", "Note"))
         self.titleLabel.setText(_translate("noteForm", "Title:"))
         self.savePushButton.setText(_translate("noteForm", "Save"))
+        self.deletePushButton.setText(_translate("noteForm", "Delete"))
 
 
 if __name__ == "__main__":
