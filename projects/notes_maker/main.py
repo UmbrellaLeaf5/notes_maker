@@ -28,20 +28,14 @@ class Window(QtWidgets.QMainWindow):
 
         self.ui.notesListWidget.itemDoubleClicked.connect(self.OpenNote)
 
-        self.ui.notesListWidget.itemEntered.connect(self.DeleteNoteBySelection)
+        self.ui.notesListWidget.itemClicked.connect(self.ConnectDeleteBySelection)
 
         self.ui.notesListWidget.itemSelectionChanged.connect(
             lambda: self.ui.deletePushButton.setEnabled(False))
 
     def NewNote(self, action_stub, need_open: bool = True, title: str = "", text: str = "") -> None:
-        index = len(self.__notes_list)
-
-        print("NEW: ", index, len(self.__notes_list))
-
         if (self.__folder == ""):
             self.SelectFolder()
-
-        new_note = NoteWidget()
 
         self.__untitled_counter = self.MaxUntitledNoteNumber() + 1
 
@@ -51,28 +45,40 @@ class Window(QtWidgets.QMainWindow):
             if (self.__untitled_counter):
                 title = f"UntitledNote_{self.__untitled_counter}"
 
+        new_note = NoteWidget(title, text, len(self.__notes_list))
+
+        # print("NEW: ", new_note.Index(), len(self.__notes_list))
+
         new_note.SetTitle(title)
         new_note.SetText(text)
 
         self.ui.notesListWidget.addItem(title)
         self.__notes_list.append(new_note)
 
-        self.SaveNote(index)
+        self.SaveNote(new_note.Index())
 
-        self.__notes_list[index].ui.deletePushButton.clicked.connect(lambda: self.DeleteNote(index))
-        self.__notes_list[index].ui.savePushButton.clicked.connect(lambda: self.SaveNote(index))
+        self.__notes_list[new_note.Index()].ui.deletePushButton.clicked.connect(
+            lambda: self.DeleteNote(new_note.Index()))
+
+        self.__notes_list[new_note.Index()].ui.savePushButton.clicked.connect(
+            lambda: self.SaveNote(new_note.Index()))
 
         # открытие в конце
         if (need_open):
-            self.__notes_list[index].show()
+            self.__notes_list[new_note.Index()].show()
 
-    def DeleteNoteBySelection(self, item: QtWidgets.QListWidgetItem) -> None:
-        index = self.ui.notesListWidget.row(item)
+    def ConnectDeleteBySelection(self, item: QtWidgets.QListWidgetItem) -> None:
+        if (self.ui.deletePushButton.receivers(self.ui.deletePushButton.clicked)):
+            self.ui.deletePushButton.clicked.disconnect()
+
         self.ui.deletePushButton.setEnabled(True)
-        self.ui.deletePushButton.clicked.connect(lambda: self.DeleteNote(index))
+        # print("SELECTION: ", self.ui.notesListWidget.row(item), len(self.__notes_list))
+
+        self.ui.deletePushButton.clicked.connect(
+            lambda: self.DeleteNote(self.ui.notesListWidget.row(item)))
 
     def DeleteNote(self, index: int = -1) -> None:
-        print("DELETE: ", index, len(self.__notes_list))
+        # print("DELETE: ", index, len(self.__notes_list))
 
         file = os.path.join(
             self.__folder, self.__notes_list[index].Title())
@@ -82,13 +88,15 @@ class Window(QtWidgets.QMainWindow):
         self.ui.notesListWidget.update()
 
         self.__notes_list[index].setVisible(False)
-
         self.__notes_list.pop(index)
+
+        for i in range(len(self.__notes_list)):
+            self.__notes_list[i].SetIndex(i)
 
     def OpenNote(self, item: QtWidgets.QListWidgetItem) -> None:
         index = self.ui.notesListWidget.row(item)
 
-        print("OPEN: ", index, len(self.__notes_list))
+        # print("OPEN: ", index, len(self.__notes_list))
 
         file_name = self.__notes_list[index].Title()
 
@@ -105,7 +113,7 @@ class Window(QtWidgets.QMainWindow):
         self.__notes_list[index].show()
 
     def SaveNote(self, index) -> None:
-        print("SAVE: ", index, len(self.__notes_list))
+        # print("SAVE: ", index, len(self.__notes_list))
 
         file_name = self.__notes_list[index].Title()
 
@@ -118,9 +126,11 @@ class Window(QtWidgets.QMainWindow):
         with open(file_path, 'w', encoding='utf-8') as file:
             file.write(self.__notes_list[index].Text())
 
-        # if (self.ui.notesListWidget.item(index).text() != self.__notes_list[index].Title()):
-        #     self.ui.notesListWidget.item(index).setText(self.__notes_list[index].Title())
-        #     os.remove(self.ui.notesListWidget.item(index).text() + ".txt")
+        if (self.ui.notesListWidget.item(index).text() != self.__notes_list[index].Title()):
+            file_path = os.path.join(
+                self.__folder, self.ui.notesListWidget.item(index).text() + ".txt")
+            os.remove(file_path)
+            self.ui.notesListWidget.item(index).setText(self.__notes_list[index].Title())
 
     def SelectFolder(self) -> None:
         self.__folder = QtWidgets.QFileDialog.getExistingDirectory(
@@ -146,7 +156,7 @@ class Window(QtWidgets.QMainWindow):
                 self.NewNote(0, False, txt_file[:-4], file_text)
 
         except:
-            """"""
+            pass  # yeah, nothing, lol
 
     def MaxUntitledNoteNumber(self):
         untitled_note_pattern = re.compile(r'UntitledNote_(\d+)\.txt')
