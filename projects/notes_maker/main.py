@@ -182,6 +182,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
 
+    # https://www.flaticon.com/ru/free-icon/text-editor_1159348?page=2&position=1&term=text&origin=style-search&related_id=1159348
     icon = QtGui.QIcon('icon.png')
     app.setWindowIcon(icon)
 
