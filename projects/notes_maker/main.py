@@ -38,92 +38,91 @@ class Window(QtWidgets.QMainWindow):
         # если название не было передано, то это новая метка
         if (title == ""):
             title = "UntitledNote"
-            print(self.MaxUntitledNoteNumber())
 
             if (self.MaxUntitledNoteNumber() >= 0):
                 title = f"UntitledNote_{self.MaxUntitledNoteNumber() + 1}"
 
         new_note = NoteWidget(title, text, len(self.__notes_list))
 
-        # print("NEW: ", new_note.Index(), len(self.__notes_list))
-
-        new_note.SetTitle(title)
-        new_note.SetText(text)
-
+        # добавление заметки в общий список и ListWidget
         self.ui.notesListWidget.addItem(title)
         self.__notes_list.append(new_note)
 
+        # сохранение новой заметки как файла
         self.SaveNote(new_note.Index())
 
+        # присоединение кнопок сохранения и удаления к соотв. функциям
         self.__notes_list[new_note.Index()].ui.deletePushButton.clicked.connect(
             lambda: self.DeleteNote(new_note.Index()))
 
         self.__notes_list[new_note.Index()].ui.savePushButton.clicked.connect(
             lambda: self.SaveNote(new_note.Index()))
 
-        # открытие в конце
+        # открытие окна в конце
         if (need_open):
             self.__notes_list[new_note.Index()].show()
 
     def ConnectDeleteBySelection(self, item: QtWidgets.QListWidgetItem) -> None:
+        # отключение всех предыдущих коннектов
         if (self.ui.deletePushButton.receivers(self.ui.deletePushButton.clicked)):
             self.ui.deletePushButton.clicked.disconnect()
 
+        # активация кнопки и её коннект
         self.ui.deletePushButton.setEnabled(True)
-        # print("SELECTION: ", self.ui.notesListWidget.row(item), len(self.__notes_list))
-
         self.ui.deletePushButton.clicked.connect(
             lambda: self.DeleteNote(self.ui.notesListWidget.row(item)))
 
     def DeleteNote(self, index: int = -1) -> None:
-        # print("DELETE: ", index, len(self.__notes_list))
-
+        # получение файла по названию заметки и его удаление
         file = os.path.join(
             self.__folder, self.__notes_list[index].Title())
         os.remove(file + ".txt")
 
+        # удаление заметки в ListWidget
         self.ui.notesListWidget.takeItem(index)
         self.ui.notesListWidget.update()
 
+        # закрытие окна (close почему-то не работает)
         self.__notes_list[index].setVisible(False)
+
+        # удаление заметки в общем списке
         self.__notes_list.pop(index)
 
+        # обновление индексов у всех меток
         for i in range(len(self.__notes_list)):
             self.__notes_list[i].SetIndex(i)
 
     def OpenNote(self, item: QtWidgets.QListWidgetItem) -> None:
+        # получение индекса исходя из колонки кликнутого item-а в ListWidget
         index = self.ui.notesListWidget.row(item)
 
-        # print("OPEN: ", index, len(self.__notes_list))
-
+        # получение полного пути к файлу заметки
         file_name = self.__notes_list[index].Title()
-
         os.makedirs(self.__folder, exist_ok=True)
         file_path = os.path.join(self.__folder, file_name)
-
         if (file_path[-4:] != ".txt"):
             file_path += ".txt"
 
+        # открытие метки на чтение и установка текста в новом окне
         with open(file_path, 'r', encoding='utf-8') as file:
             self.__notes_list[index].SetText(file.read())
 
-        # открытие в конце
+        # открытие окна в конце
         self.__notes_list[index].show()
 
     def SaveNote(self, index) -> None:
-        # print("SAVE: ", index, len(self.__notes_list))
-
+        # получение полного пути к файлу заметки
         file_name = self.__notes_list[index].Title()
-
         os.makedirs(self.__folder, exist_ok=True)
         file_path = os.path.join(self.__folder, file_name)
-
         if (file_path[-4:] != ".txt"):
             file_path += ".txt"
 
+        # открытие метки на запись и установка текста из окна
         with open(file_path, 'w', encoding='utf-8') as file:
             file.write(self.__notes_list[index].Text())
 
+        # (в том случае, если было изменено название - удаляем старый файл)
         if (self.ui.notesListWidget.item(index).text() != self.__notes_list[index].Title()):
             file_path = os.path.join(
                 self.__folder, self.ui.notesListWidget.item(index).text() + ".txt")
