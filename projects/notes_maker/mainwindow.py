@@ -32,15 +32,15 @@ class Ui_MainWindow(object):
         spacerItem = QtWidgets.QSpacerItem(
             20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
         self.verticalLayout.addItem(spacerItem)
-        self.mewPushButton = QtWidgets.QPushButton(parent=self.horizontalWidget)
+        self.newPushButton = QtWidgets.QPushButton(parent=self.horizontalWidget)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.mewPushButton.sizePolicy().hasHeightForWidth())
-        self.mewPushButton.setSizePolicy(sizePolicy)
-        self.mewPushButton.setObjectName("mewPushButton")
-        self.verticalLayout.addWidget(self.mewPushButton)
+        sizePolicy.setHeightForWidth(self.newPushButton.sizePolicy().hasHeightForWidth())
+        self.newPushButton.setSizePolicy(sizePolicy)
+        self.newPushButton.setObjectName("newPushButton")
+        self.verticalLayout.addWidget(self.newPushButton)
         self.folderPushButton = QtWidgets.QPushButton(parent=self.horizontalWidget)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
@@ -69,7 +69,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "NotesMaker"))
-        self.mewPushButton.setText(_translate("MainWindow", "New"))
+        self.newPushButton.setText(_translate("MainWindow", "New"))
         self.folderPushButton.setText(_translate("MainWindow", "Folder"))
         self.deletePushButton.setText(_translate("MainWindow", "Delete"))
 

@@ -9,7 +9,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
-class Ui_noteForm(object):
+class Ui_NoteForm(object):
     def setupUi(self, noteForm):
         noteForm.setObjectName("noteForm")
         noteForm.resize(500, 600)
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     noteForm = QtWidgets.QWidget()
-    ui = Ui_noteForm()
+    ui = Ui_NoteForm()
     ui.setupUi(noteForm)
     noteForm.show()
     sys.exit(app.exec())
