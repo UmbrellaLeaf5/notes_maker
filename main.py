@@ -24,7 +24,6 @@ class Window(QtWidgets.QMainWindow):
         self.ui.folderPushButton.clicked.connect(self.SelectFolder)
 
         self.ui.notesListWidget.itemDoubleClicked.connect(self.OpenNote)
-
         self.ui.notesListWidget.itemClicked.connect(self.ConnectDeleteBySelection)
 
         self.ui.notesListWidget.itemSelectionChanged.connect(
@@ -35,32 +34,33 @@ class Window(QtWidgets.QMainWindow):
         if (self.__folder == ""):
             self.SelectFolder()
 
-        # если название не было передано, то это новая метка
-        if (title == ""):
-            title = "UntitledNote"
+        if (self.__folder != ""):
+            # если название не было передано, то это новая метка
+            if (title == ""):
+                title = "UntitledNote"
 
-            if (self.MaxUntitledNoteNumber() >= 0):
-                title = f"UntitledNote_{self.MaxUntitledNoteNumber() + 1}"
+                if (self.MaxUntitledNoteNumber() >= 0):
+                    title = f"UntitledNote_{self.MaxUntitledNoteNumber() + 1}"
 
-        new_note = NoteWidget(title, text, len(self.__notes_list))
+            new_note = NoteWidget(title, text, len(self.__notes_list))
 
-        # добавление заметки в общий список и ListWidget
-        self.ui.notesListWidget.addItem(title)
-        self.__notes_list.append(new_note)
+            # добавление заметки в общий список и ListWidget
+            self.ui.notesListWidget.addItem(title)
+            self.__notes_list.append(new_note)
 
-        # сохранение новой заметки как файла
-        self.SaveNote(new_note.Index())
+            # сохранение новой заметки как файла
+            self.SaveNote(new_note.Index())
 
-        # присоединение кнопок сохранения и удаления к соотв. функциям
-        self.__notes_list[new_note.Index()].ui.deletePushButton.clicked.connect(
-            lambda: self.DeleteNote(new_note.Index()))
+            # присоединение кнопок сохранения и удаления к соотв. функциям
+            self.__notes_list[new_note.Index()].ui.deletePushButton.clicked.connect(
+                lambda: self.DeleteNote(new_note.Index()))
 
-        self.__notes_list[new_note.Index()].ui.savePushButton.clicked.connect(
-            lambda: self.SaveNote(new_note.Index()))
+            self.__notes_list[new_note.Index()].ui.savePushButton.clicked.connect(
+                lambda: self.SaveNote(new_note.Index()))
 
-        # открытие окна в конце
-        if (need_open):
-            self.__notes_list[new_note.Index()].show()
+            # открытие окна в конце
+            if (need_open):
+                self.__notes_list[new_note.Index()].show()
 
     def ConnectDeleteBySelection(self, item: QtWidgets.QListWidgetItem) -> None:
         # отключение всех предыдущих коннектов
@@ -72,7 +72,7 @@ class Window(QtWidgets.QMainWindow):
         self.ui.deletePushButton.clicked.connect(
             lambda: self.DeleteNote(self.ui.notesListWidget.row(item)))
 
-    def DeleteNote(self, index: int = -1) -> None:
+    def DeleteNote(self, index: int) -> None:
         # получение файла по названию заметки и его удаление
         file = os.path.join(
             self.__folder, self.__notes_list[index].Title())
@@ -110,7 +110,7 @@ class Window(QtWidgets.QMainWindow):
         # открытие окна в конце
         self.__notes_list[index].show()
 
-    def SaveNote(self, index) -> None:
+    def SaveNote(self, index: int) -> None:
         # получение полного пути к файлу заметки
         file_name = self.__notes_list[index].Title()
         os.makedirs(self.__folder, exist_ok=True)
