@@ -2,14 +2,14 @@ from PyQt6 import QtCore, QtWidgets
 
 
 class Ui_NoteForm(object):
-    def setupUi(self, noteForm):
-        noteForm.setObjectName("noteForm")
-        noteForm.resize(300, 400)
+    def setupUi(self, NoteForm):
+        NoteForm.setObjectName("NoteForm")
+        NoteForm.resize(300, 400)
 
-        self.verticalLayout = QtWidgets.QVBoxLayout(noteForm)
+        self.verticalLayout = QtWidgets.QVBoxLayout(NoteForm)
         self.verticalLayout.setObjectName("verticalLayout")
 
-        self.horizontalWidget = QtWidgets.QWidget(parent=noteForm)
+        self.horizontalWidget = QtWidgets.QWidget(parent=NoteForm)
         self.horizontalWidget.setObjectName("horizontalWidget")
 
         self.titleLayout = QtWidgets.QHBoxLayout(self.horizontalWidget)
@@ -27,12 +27,12 @@ class Ui_NoteForm(object):
 
         self.verticalLayout.addWidget(self.horizontalWidget)
 
-        self.textEdit = QtWidgets.QTextEdit(parent=noteForm)
+        self.textEdit = QtWidgets.QTextEdit(parent=NoteForm)
         self.textEdit.setObjectName("textEdit")
 
         self.verticalLayout.addWidget(self.textEdit)
 
-        self.footerWidget = QtWidgets.QWidget(parent=noteForm)
+        self.footerWidget = QtWidgets.QWidget(parent=NoteForm)
         self.footerWidget.setObjectName("footerWidget")
 
         self.buttonsHorizontalLayout = QtWidgets.QHBoxLayout(self.footerWidget)
@@ -55,22 +55,48 @@ class Ui_NoteForm(object):
 
         self.verticalLayout.addWidget(self.footerWidget)
 
-        self.retranslateUi(noteForm)
-        QtCore.QMetaObject.connectSlotsByName(noteForm)
+        stylesheet = """
+            QWidget {
+                background-color: #151515;
+                color: #ffffff;
+            }
+            QPushButton {
+                background-color: #333333;
+            }
+            QPushButton:disabled {
+                background-color: #222222;
+                color: #888888;
+            }
+            QPushButton:hover {
+                background-color: #444444;
+            }
+            QLineEdit {
+                background-color: #222222;
+                border: none;
+            }
+            QTextEdit {
+                background-color: #222222;
+                border: none;
+            }
+        """
+        NoteForm.setStyleSheet(stylesheet)
 
-    def retranslateUi(self, noteForm):
+        self.retranslateUi(NoteForm)
+        QtCore.QMetaObject.connectSlotsByName(NoteForm)
+
+    def retranslateUi(self, NoteForm):
         _translate = QtCore.QCoreApplication.translate
-        noteForm.setWindowTitle(_translate("noteForm", "Note"))
-        self.titleLabel.setText(_translate("noteForm", "Title:"))
-        self.savePushButton.setText(_translate("noteForm", "Save"))
-        self.deletePushButton.setText(_translate("noteForm", "Delete"))
+        NoteForm.setWindowTitle(_translate("NoteForm", "Note"))
+        self.titleLabel.setText(_translate("NoteForm", "Title:"))
+        self.savePushButton.setText(_translate("NoteForm", "Save"))
+        self.deletePushButton.setText(_translate("NoteForm", "Delete"))
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    noteForm = QtWidgets.QWidget()
+    NoteForm = QtWidgets.QWidget()
     ui = Ui_NoteForm()
-    ui.setupUi(noteForm)
-    noteForm.show()
+    ui.setupUi(NoteForm)
+    NoteForm.show()
     sys.exit(app.exec())

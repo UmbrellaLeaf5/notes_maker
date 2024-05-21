@@ -74,6 +74,35 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addLayout(self.verticalLayout)
         MainWindow.setCentralWidget(self.horizontalWidget)
 
+        stylesheet = """
+            QWidget {
+                background-color: #151515;
+                color: #ffffff;
+            }
+            QPushButton {
+                background-color: #333333;
+            }
+            QPushButton:disabled {
+                background-color: #222222;
+                color: #888888;
+            }
+            QPushButton:hover {
+                background-color: #444444;
+            }
+            QListWidget {
+                background-color: #222222;
+                border: none;
+            }
+            QListWidget::item:hover {
+                background-color: #333333;
+            }
+            QListWidget::item:selected {
+                background-color: #444444;
+                color: #ffffff;
+            }
+        """
+        MainWindow.setStyleSheet(stylesheet)
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
