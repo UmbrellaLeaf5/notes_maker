@@ -2,8 +2,8 @@ import os
 
 from PyQt6 import QtGui, QtWidgets
 
-from main_window import Ui_MainWindow
-from note_widget import NoteWidget
+from ui.main.window import Ui_MainWindow
+from ui.note.widget import NoteWidget
 
 
 class Window(QtWidgets.QMainWindow):
@@ -192,7 +192,7 @@ if __name__ == "__main__":
   app = QtWidgets.QApplication(sys.argv)
 
   # https://www.flaticon.com/ru/free-icon/text-editor_1159348?page=2&position=1&term=text&origin=style-search&related_id=1159348
-  icon = QtGui.QIcon("icon.png")
+  icon = QtGui.QIcon("ui/pictures/icon.png")
   app.setWindowIcon(icon)
 
   window = Window()

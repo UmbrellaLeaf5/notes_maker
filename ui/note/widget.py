@@ -1,6 +1,6 @@
 from PyQt6 import QtWidgets
 
-from note_form import Ui_NoteForm
+from ui.note.form import Ui_NoteForm
 
 
 class NoteWidget(QtWidgets.QWidget):
