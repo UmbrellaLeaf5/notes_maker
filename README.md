@@ -62,13 +62,13 @@
     Перед тем как начать, вам необходимо клонировать репозиторий с исходным кодом проекта.
 
     ```bash
-    git clone https://github.com/UmbrellaLeaf5/template_python_usual.git
+    git clone https://github.com/UmbrellaLeaf5/notes_maker.git
     ```
 
     Перейдите в директорию, куда был клонирован репозиторий:
 
     ```bash
-    cd template_python_usual
+    cd notes_maker
     ```
 
 1.  **Создание виртуального окружения:**
