@@ -152,13 +152,23 @@ class Window(QtWidgets.QMainWindow):
       for txt_file in txt_files:
         file_path = os.path.join(self.__folder, txt_file)
 
-        with open(file_path, encoding="utf-8") as file:
-          file_text = file.read()
+        try:
+          with open(file_path, encoding="utf-8") as file:
+            file_text = file.read()
+
+        except UnicodeDecodeError:
+          try:
+            with open(file_path, encoding="cp1251") as file:
+              file_text = file.read()
+
+          except UnicodeDecodeError:
+            print(f"File: not cp1251 and not UTF-8: {txt_file}, skipping...")
+            continue
 
         self.NewNote(0, False, txt_file[:-4], file_text)
 
-    except Exception:
-      pass  # yeah, nothing, lol
+    except Exception as ex:
+      print(f"Exception: {ex}")
 
   def MaxUntitledNoteNumber(self):
     note_files = [
