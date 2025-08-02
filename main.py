@@ -1,192 +1,201 @@
 import os
 
-from PyQt6 import QtWidgets, QtGui
+from PyQt6 import QtGui, QtWidgets
 
 from main_window import Ui_MainWindow
 from note_widget import NoteWidget
 
 
 class Window(QtWidgets.QMainWindow):
+  __notes_list: list[NoteWidget]
+  __folder: str
 
-    __notes_list: list[NoteWidget]
-    __folder: str
+  def __init__(self) -> None:
+    super().__init__()
 
-    def __init__(self) -> None:
-        super().__init__()
+    self.ui = Ui_MainWindow()
+    self.ui.setupUi(self)
 
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+    self.__notes_list = []
+    self.__folder = ""
 
-        self.__notes_list = []
-        self.__folder = ""
+    self.ui.newPushButton.clicked.connect(self.NewNote)
+    self.ui.folderPushButton.clicked.connect(self.SelectFolder)
 
-        self.ui.newPushButton.clicked.connect(self.NewNote)
-        self.ui.folderPushButton.clicked.connect(self.SelectFolder)
+    self.ui.notesListWidget.itemDoubleClicked.connect(self.OpenNote)
+    self.ui.notesListWidget.itemClicked.connect(self.ConnectDeleteBySelection)
 
-        self.ui.notesListWidget.itemDoubleClicked.connect(self.OpenNote)
-        self.ui.notesListWidget.itemClicked.connect(self.ConnectDeleteBySelection)
+    self.ui.notesListWidget.itemSelectionChanged.connect(
+      lambda: self.ui.deletePushButton.setEnabled(False)
+    )
 
-        self.ui.notesListWidget.itemSelectionChanged.connect(
-            lambda: self.ui.deletePushButton.setEnabled(False))
+  def NewNote(
+    self, action_stub, need_open: bool = True, title: str = "", text: str = ""
+  ) -> None:
+    # если не установлена папка, спрашиваем её
+    if self.__folder == "":
+      self.SelectFolder()
 
-    def NewNote(self, action_stub, need_open: bool = True, title: str = "", text: str = "") -> None:
-        # если не установлена папка, спрашиваем её
-        if (self.__folder == ""):
-            self.SelectFolder()
+    if self.__folder != "":
+      # если название не было передано, то это новая метка
+      if title == "":
+        title = "UntitledNote"
 
-        if (self.__folder != ""):
-            # если название не было передано, то это новая метка
-            if (title == ""):
-                title = "UntitledNote"
+        if self.MaxUntitledNoteNumber() >= 0:
+          title = f"UntitledNote_{self.MaxUntitledNoteNumber() + 1}"
 
-                if (self.MaxUntitledNoteNumber() >= 0):
-                    title = f"UntitledNote_{self.MaxUntitledNoteNumber() + 1}"
+      new_note = NoteWidget(title, text, len(self.__notes_list))
 
-            new_note = NoteWidget(title, text, len(self.__notes_list))
+      # добавление заметки в общий список и ListWidget
+      self.ui.notesListWidget.addItem(title)
+      self.__notes_list.append(new_note)
 
-            # добавление заметки в общий список и ListWidget
-            self.ui.notesListWidget.addItem(title)
-            self.__notes_list.append(new_note)
+      # сохранение новой заметки как файла
+      self.SaveNote(new_note.Index())
 
-            # сохранение новой заметки как файла
-            self.SaveNote(new_note.Index())
+      # присоединение кнопок сохранения и удаления к соотв. функциям
+      self.__notes_list[new_note.Index()].ui.deletePushButton.clicked.connect(
+        lambda: self.DeleteNote(new_note.Index())
+      )
 
-            # присоединение кнопок сохранения и удаления к соотв. функциям
-            self.__notes_list[new_note.Index()].ui.deletePushButton.clicked.connect(
-                lambda: self.DeleteNote(new_note.Index()))
+      self.__notes_list[new_note.Index()].ui.savePushButton.clicked.connect(
+        lambda: self.SaveNote(new_note.Index())
+      )
 
-            self.__notes_list[new_note.Index()].ui.savePushButton.clicked.connect(
-                lambda: self.SaveNote(new_note.Index()))
+      # открытие окна в конце
+      if need_open:
+        self.__notes_list[new_note.Index()].show()
 
-            # открытие окна в конце
-            if (need_open):
-                self.__notes_list[new_note.Index()].show()
+  def ConnectDeleteBySelection(self, item: QtWidgets.QListWidgetItem) -> None:
+    # отключение всех предыдущих коннектов
+    if self.ui.deletePushButton.receivers(self.ui.deletePushButton.clicked):
+      self.ui.deletePushButton.clicked.disconnect()
 
-    def ConnectDeleteBySelection(self, item: QtWidgets.QListWidgetItem) -> None:
-        # отключение всех предыдущих коннектов
-        if (self.ui.deletePushButton.receivers(self.ui.deletePushButton.clicked)):
-            self.ui.deletePushButton.clicked.disconnect()
+    # активация кнопки и её коннект
+    self.ui.deletePushButton.setEnabled(True)
+    self.ui.deletePushButton.clicked.connect(
+      lambda: self.DeleteNote(self.ui.notesListWidget.row(item))
+    )
 
-        # активация кнопки и её коннект
-        self.ui.deletePushButton.setEnabled(True)
-        self.ui.deletePushButton.clicked.connect(
-            lambda: self.DeleteNote(self.ui.notesListWidget.row(item)))
+  def DeleteNote(self, index: int) -> None:
+    # получение файла по названию заметки и его удаление
+    file = os.path.join(self.__folder, self.__notes_list[index].Title())
+    os.remove(file + ".txt")
 
-    def DeleteNote(self, index: int) -> None:
-        # получение файла по названию заметки и его удаление
-        file = os.path.join(
-            self.__folder, self.__notes_list[index].Title())
-        os.remove(file + ".txt")
+    # удаление заметки в ListWidget
+    self.ui.notesListWidget.takeItem(index)
+    self.ui.notesListWidget.update()
 
-        # удаление заметки в ListWidget
-        self.ui.notesListWidget.takeItem(index)
-        self.ui.notesListWidget.update()
+    # закрытие окна (close почему-то не работает)
+    self.__notes_list[index].setVisible(False)
 
-        # закрытие окна (close почему-то не работает)
-        self.__notes_list[index].setVisible(False)
+    # удаление заметки в общем списке
+    self.__notes_list.pop(index)
 
-        # удаление заметки в общем списке
-        self.__notes_list.pop(index)
+    # обновление индексов у всех меток
+    for i in range(len(self.__notes_list)):
+      self.__notes_list[i].SetIndex(i)
 
-        # обновление индексов у всех меток
-        for i in range(len(self.__notes_list)):
-            self.__notes_list[i].SetIndex(i)
+  def OpenNote(self, item: QtWidgets.QListWidgetItem) -> None:
+    # получение индекса исходя из колонки кликнутого item-а в ListWidget
+    index = self.ui.notesListWidget.row(item)
 
-    def OpenNote(self, item: QtWidgets.QListWidgetItem) -> None:
-        # получение индекса исходя из колонки кликнутого item-а в ListWidget
-        index = self.ui.notesListWidget.row(item)
+    # получение полного пути к файлу заметки
+    file_name = self.__notes_list[index].Title()
+    os.makedirs(self.__folder, exist_ok=True)
+    file_path = os.path.join(self.__folder, file_name)
+    if file_path[-4:] != ".txt":
+      file_path += ".txt"
 
-        # получение полного пути к файлу заметки
-        file_name = self.__notes_list[index].Title()
-        os.makedirs(self.__folder, exist_ok=True)
-        file_path = os.path.join(self.__folder, file_name)
-        if (file_path[-4:] != ".txt"):
-            file_path += ".txt"
+    # открытие метки на чтение и установка текста в новом окне
+    with open(file_path, encoding="utf-8") as file:
+      self.__notes_list[index].SetText(file.read())
 
-        # открытие метки на чтение и установка текста в новом окне
-        with open(file_path, 'r', encoding='utf-8') as file:
-            self.__notes_list[index].SetText(file.read())
+    # открытие окна в конце
+    self.__notes_list[index].show()
 
-        # открытие окна в конце
-        self.__notes_list[index].show()
+  def SaveNote(self, index: int) -> None:
+    # получение полного пути к файлу заметки
+    file_name = self.__notes_list[index].Title()
+    os.makedirs(self.__folder, exist_ok=True)
+    file_path = os.path.join(self.__folder, file_name)
+    if file_path[-4:] != ".txt":
+      file_path += ".txt"
 
-    def SaveNote(self, index: int) -> None:
-        # получение полного пути к файлу заметки
-        file_name = self.__notes_list[index].Title()
-        os.makedirs(self.__folder, exist_ok=True)
-        file_path = os.path.join(self.__folder, file_name)
-        if (file_path[-4:] != ".txt"):
-            file_path += ".txt"
+    # открытие метки на запись и установка текста из окна
+    with open(file_path, "w", encoding="utf-8") as file:
+      file.write(self.__notes_list[index].Text())
 
-        # открытие метки на запись и установка текста из окна
-        with open(file_path, 'w', encoding='utf-8') as file:
-            file.write(self.__notes_list[index].Text())
+    # (в том случае, если было изменено название - удаляем старый файл)
+    if self.ui.notesListWidget.item(index).text() != self.__notes_list[index].Title():  # pyright: ignore[reportOptionalMemberAccess]
+      file_path = os.path.join(
+        self.__folder,
+        self.ui.notesListWidget.item(index).text() + ".txt",  # pyright: ignore[reportOptionalMemberAccess]
+      )
+      os.remove(file_path)
+      self.ui.notesListWidget.item(index).setText(self.__notes_list[index].Title())  # pyright: ignore[reportOptionalMemberAccess]
 
-        # (в том случае, если было изменено название - удаляем старый файл)
-        if (self.ui.notesListWidget.item(index).text() != self.__notes_list[index].Title()):
-            file_path = os.path.join(
-                self.__folder, self.ui.notesListWidget.item(index).text() + ".txt")
-            os.remove(file_path)
-            self.ui.notesListWidget.item(index).setText(self.__notes_list[index].Title())
+  def SelectFolder(self) -> None:
+    self.__folder = QtWidgets.QFileDialog.getExistingDirectory(self, "Select folder", "")
 
-    def SelectFolder(self) -> None:
-        self.__folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self, "Select folder", "")
+    if self.__folder:
+      self.UpdateNotesList()
 
-        if self.__folder:
-            self.UpdateNotesList()
+  def UpdateNotesList(self) -> None:
+    self.ui.notesListWidget.clear()
+    self.__notes_list.clear()
 
-    def UpdateNotesList(self) -> None:
-        self.ui.notesListWidget.clear()
-        self.__notes_list.clear()
+    try:
+      files = os.listdir(self.__folder)
+      txt_files = [f for f in files if f.endswith(".txt")]
 
+      for txt_file in txt_files:
+        file_path = os.path.join(self.__folder, txt_file)
+
+        with open(file_path, encoding="utf-8") as file:
+          file_text = file.read()
+
+        self.NewNote(0, False, txt_file[:-4], file_text)
+
+    except Exception:
+      pass  # yeah, nothing, lol
+
+  def MaxUntitledNoteNumber(self):
+    note_files = [
+      f
+      for f in os.listdir(self.__folder)
+      if f.startswith("UntitledNote") and f.endswith(".txt")
+    ]
+
+    if not note_files:
+      return -1
+
+    if len(note_files) == 1 and note_files[0] == "UntitledNote.txt":
+      return 0
+
+    # извлекаем номера из файлов и находим максимальный
+    numbers = []
+    for f in note_files:
+      if "_" in f:
         try:
-            files = os.listdir(self.__folder)
-            txt_files = [f for f in files if f.endswith('.txt')]
+          num = int(f.split("_")[1].split(".")[0])
+          numbers.append(num)
+        except (IndexError, ValueError):
+          pass
 
-            for txt_file in txt_files:
-                file_path = os.path.join(self.__folder, txt_file)
-
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    file_text = file.read()
-
-                self.NewNote(0, False, txt_file[:-4], file_text)
-
-        except:
-            pass  # yeah, nothing, lol
-
-    def MaxUntitledNoteNumber(self):
-        note_files = [f for f in os.listdir(self.__folder) if f.startswith(
-            "UntitledNote") and f.endswith(".txt")]
-
-        if not note_files:
-            return -1
-
-        if len(note_files) == 1 and note_files[0] == "UntitledNote.txt":
-            return 0
-
-        # извлекаем номера из файлов и находим максимальный
-        numbers = []
-        for f in note_files:
-            if "_" in f:
-                try:
-                    num = int(f.split("_")[1].split(".")[0])
-                    numbers.append(num)
-                except (IndexError, ValueError):
-                    pass
-
-        return max(numbers)
+    return max(numbers)
 
 
 if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
+  import sys
 
-    # https://www.flaticon.com/ru/free-icon/text-editor_1159348?page=2&position=1&term=text&origin=style-search&related_id=1159348
-    icon = QtGui.QIcon('icon.png')
-    app.setWindowIcon(icon)
+  app = QtWidgets.QApplication(sys.argv)
 
-    window = Window()
-    window.show()
+  # https://www.flaticon.com/ru/free-icon/text-editor_1159348?page=2&position=1&term=text&origin=style-search&related_id=1159348
+  icon = QtGui.QIcon("icon.png")
+  app.setWindowIcon(icon)
 
-    sys.exit(app.exec())
+  window = Window()
+  window.show()
+
+  sys.exit(app.exec())

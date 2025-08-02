@@ -1,61 +1,62 @@
 from PyQt6 import QtCore, QtWidgets
 
 
-class Ui_NoteForm(object):
-    def setupUi(self, NoteForm):
-        NoteForm.setObjectName("NoteForm")
-        NoteForm.resize(300, 400)
+class Ui_NoteForm:
+  def setupUi(self, NoteForm):
+    NoteForm.setObjectName("NoteForm")
+    NoteForm.resize(300, 400)
 
-        self.verticalLayout = QtWidgets.QVBoxLayout(NoteForm)
-        self.verticalLayout.setObjectName("verticalLayout")
+    self.verticalLayout = QtWidgets.QVBoxLayout(NoteForm)
+    self.verticalLayout.setObjectName("verticalLayout")
 
-        self.horizontalWidget = QtWidgets.QWidget(parent=NoteForm)
-        self.horizontalWidget.setObjectName("horizontalWidget")
+    self.horizontalWidget = QtWidgets.QWidget(parent=NoteForm)
+    self.horizontalWidget.setObjectName("horizontalWidget")
 
-        self.titleLayout = QtWidgets.QHBoxLayout(self.horizontalWidget)
-        self.titleLayout.setObjectName("titleLayout")
+    self.titleLayout = QtWidgets.QHBoxLayout(self.horizontalWidget)
+    self.titleLayout.setObjectName("titleLayout")
 
-        self.titleLabel = QtWidgets.QLabel(parent=self.horizontalWidget)
-        self.titleLabel.setObjectName("titleLabel")
+    self.titleLabel = QtWidgets.QLabel(parent=self.horizontalWidget)
+    self.titleLabel.setObjectName("titleLabel")
 
-        self.titleLayout.addWidget(self.titleLabel)
+    self.titleLayout.addWidget(self.titleLabel)
 
-        self.titleLineEdit = QtWidgets.QLineEdit(parent=self.horizontalWidget)
-        self.titleLineEdit.setObjectName("titleLineEdit")
+    self.titleLineEdit = QtWidgets.QLineEdit(parent=self.horizontalWidget)
+    self.titleLineEdit.setObjectName("titleLineEdit")
 
-        self.titleLayout.addWidget(self.titleLineEdit)
+    self.titleLayout.addWidget(self.titleLineEdit)
 
-        self.verticalLayout.addWidget(self.horizontalWidget)
+    self.verticalLayout.addWidget(self.horizontalWidget)
 
-        self.textEdit = QtWidgets.QTextEdit(parent=NoteForm)
-        self.textEdit.setObjectName("textEdit")
+    self.textEdit = QtWidgets.QTextEdit(parent=NoteForm)
+    self.textEdit.setObjectName("textEdit")
 
-        self.verticalLayout.addWidget(self.textEdit)
+    self.verticalLayout.addWidget(self.textEdit)
 
-        self.footerWidget = QtWidgets.QWidget(parent=NoteForm)
-        self.footerWidget.setObjectName("footerWidget")
+    self.footerWidget = QtWidgets.QWidget(parent=NoteForm)
+    self.footerWidget.setObjectName("footerWidget")
 
-        self.buttonsHorizontalLayout = QtWidgets.QHBoxLayout(self.footerWidget)
-        self.buttonsHorizontalLayout.setObjectName("buttonsHorizontalLayout")
+    self.buttonsHorizontalLayout = QtWidgets.QHBoxLayout(self.footerWidget)
+    self.buttonsHorizontalLayout.setObjectName("buttonsHorizontalLayout")
 
-        self.savePushButton = QtWidgets.QPushButton(parent=self.footerWidget)
-        self.savePushButton.setObjectName("savePushButton")
+    self.savePushButton = QtWidgets.QPushButton(parent=self.footerWidget)
+    self.savePushButton.setObjectName("savePushButton")
 
-        self.buttonsHorizontalLayout.addWidget(self.savePushButton)
+    self.buttonsHorizontalLayout.addWidget(self.savePushButton)
 
-        self.deletePushButton = QtWidgets.QPushButton(parent=self.footerWidget)
-        self.deletePushButton.setObjectName("deletePushButton")
+    self.deletePushButton = QtWidgets.QPushButton(parent=self.footerWidget)
+    self.deletePushButton.setObjectName("deletePushButton")
 
-        self.buttonsHorizontalLayout.addWidget(self.deletePushButton)
+    self.buttonsHorizontalLayout.addWidget(self.deletePushButton)
 
-        spacerItem = QtWidgets.QSpacerItem(
-            40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+    spacerItem = QtWidgets.QSpacerItem(
+      40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum
+    )
 
-        self.buttonsHorizontalLayout.addItem(spacerItem)
+    self.buttonsHorizontalLayout.addItem(spacerItem)
 
-        self.verticalLayout.addWidget(self.footerWidget)
+    self.verticalLayout.addWidget(self.footerWidget)
 
-        stylesheet = """
+    stylesheet = """
             QWidget {
                 background-color: #151515;
                 color: #ffffff;
@@ -79,24 +80,27 @@ class Ui_NoteForm(object):
                 border: none;
             }
         """
-        NoteForm.setStyleSheet(stylesheet)
+    NoteForm.setStyleSheet(stylesheet)
 
-        self.retranslateUi(NoteForm)
-        QtCore.QMetaObject.connectSlotsByName(NoteForm)
+    self.retranslateUi(NoteForm)
+    QtCore.QMetaObject.connectSlotsByName(NoteForm)
 
-    def retranslateUi(self, NoteForm):
-        _translate = QtCore.QCoreApplication.translate
-        NoteForm.setWindowTitle(_translate("NoteForm", "Note"))
-        self.titleLabel.setText(_translate("NoteForm", "Title:"))
-        self.savePushButton.setText(_translate("NoteForm", "Save"))
-        self.deletePushButton.setText(_translate("NoteForm", "Delete"))
+  def retranslateUi(self, NoteForm):
+    _translate = QtCore.QCoreApplication.translate
+    NoteForm.setWindowTitle(_translate("NoteForm", "Note"))
+    self.titleLabel.setText(_translate("NoteForm", "Title:"))
+    self.savePushButton.setText(_translate("NoteForm", "Save"))
+    self.deletePushButton.setText(_translate("NoteForm", "Delete"))
 
 
 if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    NoteForm = QtWidgets.QWidget()
-    ui = Ui_NoteForm()
-    ui.setupUi(NoteForm)
-    NoteForm.show()
-    sys.exit(app.exec())
+  import sys
+
+  app = QtWidgets.QApplication(sys.argv)
+  NoteForm = QtWidgets.QWidget()
+
+  ui = Ui_NoteForm()
+  ui.setupUi(NoteForm)
+  NoteForm.show()
+
+  sys.exit(app.exec())
